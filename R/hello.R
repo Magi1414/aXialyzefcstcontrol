@@ -36,7 +36,8 @@ df <- dbGetQuery(con, "SELECT materialghost, kilo, periods, order_periods, conti
 
  qry = "insert into fcst_accuracy (fcst_accuracy_measurement, material, geography, MAPE, created_date,
             output_description) values ($1,$2,$3,$4,$5, $6)"
- dbSendQuery(connection, qry, c("phantom_overall_Continous", phantom, "Global", fcaccuracy$MAPE, now(), fcaccuracy))
+ datex=format(as.Date(Sys.Date(),origin="1970-01-01"))
+ dbSendQuery(connection, qry, c("phantom_overall_Continous", phantom, "Global", fcaccuracy[5], datex, fcaccuracy))
 }
 
  ##apply(df, 1, f, connection = con)

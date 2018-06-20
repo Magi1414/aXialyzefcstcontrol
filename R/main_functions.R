@@ -1,7 +1,7 @@
 fcstPhantom <- function( connection , Phantom, intermittent, DateMask, yrfreq) {
 
-  query1 <- paste("select requested_deliv_date,liters from get_orderqty_per_date_inclmaterialghost(", Phantom, "")
-  query2 <- paste(query1, ",", "")
+  query1 <- paste("select requested_deliv_date,liters from get_orderqty_per_date_inclmaterialghost('", Phantom, "")
+  query2 <- paste(query1, "',", "")
   query3 <- paste(query2, DateMask, "")
   query <- paste(query3 , ")","")
   df_postgres <- RPostgreSQL::dbGetQuery(connection,  query)
