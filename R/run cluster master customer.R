@@ -29,7 +29,7 @@ con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
 df <- dbGetQuery(con, "SELECT mastermaterial,  cluster, payer,  kilo,  time_serie_category
-                 FROM time_serie_categories_master_payer_division_ts_month where time_serie_category = 'Continuous" )
+                 FROM time_serie_categories_master_payer_division_ts_month where time_serie_category = 'Continuous'" )
 # Calculate the number of cores
 no_cores <- detectCores() - 1
 
