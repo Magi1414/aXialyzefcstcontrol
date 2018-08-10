@@ -1,21 +1,4 @@
-# Hello, world!
 #
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
-
-hello <- function() {
-  print("Hello, world!")
-}
 
 require("RPostgreSQL")
 require(forecast)
@@ -29,7 +12,7 @@ con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
 df <- dbGetQuery(con, "SELECT material, cluster, customer_code, kilo,  time_serie_category
-                 FROM public.time_serie_categories_material_cluster_division_payer_ts_month where time_serie_category = 'Continuous'" )
+                 FROM public.time_serie_categories_material_cluster_division_payer_ts_month where time_serie_category = 'Continuous' limit 20" )
 # Calculate the number of cores
 no_cores <- detectCores() - 1
 
@@ -52,7 +35,7 @@ run_mat_cust_mm <- function(df, no_cores) {
       if(batchsize*(i+1) > nrow(df)){endnr <- nrow(df) }else {endnr <-  batchsize*i}
       dfall <- df[startnr:endnr, ]
       level <- "material_customer_Continous"
-     apply(dfall, 1, f_mat_cust, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12)
+     apply(dfall, 1, f_mat_cust, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "07.2018", TRUE)
     }}
 # Initiate cluster
 cl <- makeCluster(no_cores)
