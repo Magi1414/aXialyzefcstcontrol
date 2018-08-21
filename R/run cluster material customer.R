@@ -11,8 +11,8 @@ drv <- dbDriver("PostgreSQL")
 con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
-df <- dbGetQuery(con, "SELECT material, cluster, customer_code, kilo,  time_serie_category
-                 FROM public.time_serie_categories_material_cluster_division_payer_ts_month where time_serie_category = 'Continuous' limit 20" )
+df <- dbGetQuery(con, "SELECT material, cluster, customer_code, totalvolume,  ts_categorie
+                 FROM public.sandop_selection order by totalvolume desc limit 50" )
 # Calculate the number of cores
 no_cores <- detectCores() - 1
 

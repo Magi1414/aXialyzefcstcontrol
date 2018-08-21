@@ -12,7 +12,7 @@ f_mat_cust <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcseri
   fcaccuracy <- extTryCatch(fcstMat_cust(connection , phantom, iorg_level, customer, iquery, FALSE, iYYYY, ifreq , status_message))
   #print(x[1])
   #print(fcaccuracy)
-  write_fcobject_todb(connection, fcaccuracy, ilevel, phantom, iorg_level, iYYYY, fcperiod, sendfcserie)
+  write_fcobject_todb(connection, fcaccuracy, ilevel, phantom, paste(customer,paste(" - " ,iorg_level)), iYYYY, fcperiod, sendfcserie)
  # print(x[1])
 }
 
@@ -24,7 +24,7 @@ print (df_postgres)
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
 
-  returnobject <- fcstgetAccuracy(myts, intermittent, status)
+  returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq)
   returnobject$totalvolume = sum(myts)
   returnobject$ts <- myts
   status$status <- "Completed"
