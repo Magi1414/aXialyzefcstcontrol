@@ -23,37 +23,41 @@ write_fcdata_todbx <- function(position, connectionx, x, uuidx, fcperiodx){
   dbClearResult(dbs)
 }
 
-write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org_level, iYYYY, fcperiod, sendseriedetails){
-  qry = "insert into fcst_accuracy (uuid, fcst_accuracy_measurement,
+write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org_level, iYYYY, fcperiod, sendseriedetails, fcrun){
+  qry = "insert into fcst_accuracy (fcrun, uuid, fcst_accuracy_measurement,
                                    fcst_method, material,
-                                   geography, MAPE, mase, mape_limited, mase_limited, theilu_limited, created_date,
+                                   geography, MAPE, mase, mape_limited, mase_limited, theilu_limited, fca_limited, created_date,
                                    created_time,output_description, message, volume, time_mask, fcperiod)
-                                   values ($1,$2,$3,$4,$5, $6,$7,$8, $9, $10, $11, $12, $13, $14, $15, $16, $17)"
+                                   values ($1,$2,$3,$4,$5, $6,$7,$8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)"
   datex=format(as.Date(Sys.Date(),origin="1970-01-01"))
   datet=format(as.character(Sys.time()))
 
   if (is.null(fcaccuracy$error[1])) {
     errorstatus <- "completed"} else {errorstatus <- fcaccuracy$error[1]}
 
-    dbs <- dbSendQuery(connectionpga, qry, c(ifelse(is.null(fcaccuracy$value$arimauuid),"Null",fcaccuracy$value$arimauuid), ilevel,"auto.arima",phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$arimauuid),"Null",fcaccuracy$value$arimauuid), ilevel,fcaccuracy$value$arimaname,phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$arima[5]),"Null",fcaccuracy$value$arima[5]),ifelse(is.null(fcaccuracy$value$arima[6]),"Null",fcaccuracy$value$arima[6]),
                                              ifelse(is.null(fcaccuracy$value$arimalimited[[5]]),"Null",fcaccuracy$value$arimalimited[[5]]),ifelse(is.null(fcaccuracy$value$arimalimited$MASE),"Null",fcaccuracy$value$arimalimited$MASE),
-                                             ifelse(is.null(fcaccuracy$value$arimalimited[[7]]),"Null",fcaccuracy$value$arimalimited[[7]]), datex,datet,errorstatus,  ifelse(is.null(fcaccuracy$value$arimaerror), "Null", fcaccuracy$value$arimaerror),ifelse(is.null(fcaccuracy$value$totalvolume),0, fcaccuracy$value$totalvolume), iYYYY, fcperiod))
+                                             ifelse(is.null(fcaccuracy$value$arimalimited[[7]]),"Null",fcaccuracy$value$arimalimited[[7]]),
+                                             ifelse(is.null(fcaccuracy$value$arimalimited$FCA),"Null",fcaccuracy$value$arimalimited$FCA), datex,datet,errorstatus,  ifelse(is.null(fcaccuracy$value$arimaerror), "Null", fcaccuracy$value$arimaerror),ifelse(is.null(fcaccuracy$value$totalvolume),0, fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
-    dbs <- dbSendQuery(connectionpga, qry, c(ifelse(is.null(fcaccuracy$value$stlfuuid),"Null",fcaccuracy$value$stlfuuid) , ilevel, "stlf", phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$stlfuuid),"Null",fcaccuracy$value$stlfuuid) , ilevel, fcaccuracy$value$stlfname, phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$stlf[5]),"Null",fcaccuracy$value$stlf[5]), ifelse(is.null(fcaccuracy$value$stlf[6]),"Null",fcaccuracy$value$stlf[6]),
                                              ifelse(is.null(fcaccuracy$value$stlflimited[[5]]),"Null",fcaccuracy$value$stlflimited[[5]]), ifelse(is.null(fcaccuracy$value$stlflimited$MASE),"Null",fcaccuracy$value$stlflimited$MASE),
-                                             ifelse(is.null(fcaccuracy$value$stlflimited[[7]]),"Null",fcaccuracy$value$stlflimited[[7]]), datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$stlferror), "Null", fcaccuracy$value$stlferror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
+                                             ifelse(is.null(fcaccuracy$value$stlflimited[[7]]),"Null",fcaccuracy$value$stlflimited[[7]]),
+                                             ifelse(is.null(fcaccuracy$value$stlflimited$FCA),"Null",fcaccuracy$value$stlflimited$FCA), datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$stlferror), "Null", fcaccuracy$value$stlferror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
-    dbs <- dbSendQuery(connectionpga, qry, c(ifelse(is.null(fcaccuracy$value$hwuuid),"Null",fcaccuracy$value$hwuuid), ilevel, "hw", phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$hwuuid),"Null",fcaccuracy$value$hwuuid), ilevel, fcaccuracy$value$hwname, phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$hw[5]),"Null",fcaccuracy$value$hw[5]), ifelse(is.null(fcaccuracy$value$hw[6]),"Null",fcaccuracy$value$hw[6]),
                                              ifelse(is.null(fcaccuracy$value$hwlimited[[5]]),"Null",fcaccuracy$value$hwlimited[[5]]), ifelse(is.null(fcaccuracy$value$hwlimited$MASE),"Null",fcaccuracy$value$hwlimited$MASE),
-                                             ifelse(is.null(fcaccuracy$value$hwlimited[[7]]),"Null",fcaccuracy$value$hwlimited[[7]]), datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$hwerror), "Null", fcaccuracy$value$hwerror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
+                                             ifelse(is.null(fcaccuracy$value$hwlimited[[7]]),"Null",fcaccuracy$value$hwlimited[[7]]),
+                                             ifelse(is.null(fcaccuracy$value$hwlimited$FCA),"Null",fcaccuracy$value$hwlimited$FCA), datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$hwerror), "Null", fcaccuracy$value$hwerror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
-    dbs <- dbSendQuery(connectionpga, qry, c(ifelse(is.null(fcaccuracy$value$arimaintuuid),"Null",fcaccuracy$value$arimaintuuid) ,ilevel, "arimaint", phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$arimaintuuid),"Null",fcaccuracy$value$arimaintuuid) ,ilevel, fcaccuracy$value$arimaintname, phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$arimaint[5]),"Null",fcaccuracy$value$arimaint[5]), ifelse(is.null(fcaccuracy$value$arimaint[6]),"Null",fcaccuracy$value$arimaint[6]),
                                              ifelse(is.null(fcaccuracy$value$arimaintlimited[[5]]),"Null",fcaccuracy$value$arimaintlimited[[5]]), ifelse(is.null(fcaccuracy$value$arimaintlimited$MASE),"Null",fcaccuracy$value$arimaintlimited$MASE),
-                                             ifelse(is.null(fcaccuracy$value$arimaintlimited[[7]]),"Null",fcaccuracy$value$arimaintlimited[[7]]),datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$arimainterror), "Null", fcaccuracy$value$arimainterror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
+                                             ifelse(is.null(fcaccuracy$value$arimaintlimited[[7]]),"Null",fcaccuracy$value$arimaintlimited[[7]]),
+                                             ifelse(is.null(fcaccuracy$value$arimaintlimited$FCA),"Null",fcaccuracy$value$arimaintlimited$FCA),datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$arimainterror), "Null", fcaccuracy$value$arimainterror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
 
 if(sendseriedetails ){
@@ -97,6 +101,19 @@ computeMASE <- function(forecast,train,test,period){
   return(meanMASE)
 }
 
+computeFCA <- function(forecast,test){
+
+  # forecast - forecasted values
+  # test - actual data used for finding FCA.. same length as forecast
+
+  forecast <- as.vector(forecast)
+  test <- as.vector(test)
+
+  et <- ifelse(test == 0,ifelse(forecast == 0 , 0,1) , abs(test-forecast)/test)*pmax(test,1)
+  FCerror <- sum(et)/sum(pmax(test,1))
+  return(1-FCerror)
+}
+
 limited_accuracy <- function(myts,fc, pfrequency, testperiods){
   tstimes <- getTStime(myts, pfrequency)
 
@@ -106,6 +123,7 @@ limited_accuracy <- function(myts,fc, pfrequency, testperiods){
   fitted <- window(fitted(fc),start=c(tstimes[[length(tstimes)-testperiods]][1],tstimes[[length(tstimes)-testperiods]][2]))
   ac <- accuracy(fitted, observations)
   ac$MASE <- computeMASE(fitted, myts, observations, 1)
+  ac$FCA <- computeFCA(fitted, observations)
   return(ac)
 }
 
@@ -116,11 +134,22 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency){
   result$hwuuid <-  UUIDgenerate(use.time=NA)
   result$arimauuid <-  UUIDgenerate(use.time=NA)
   result$arimaintuuid <-  UUIDgenerate(use.time=NA)
+  result$arimaintname <- "arima int"
+  result$arimaname <- "auto.arima"
+  result$stlfname <- "stlf"
+  result$hwname <- "hw"
+
   if(intermittent == TRUE){
     fcstatc <- extTryCatch(forecast::auto.arima(myts))
     fcstainttc <- extTryCatch(tsintermittent::imapa(myts))
+    result$arimaintname <- "imapa"
     fcstlftc <- extTryCatch(stlf(myts, lambda=BoxCox.lambda(myts)))
-    fcsthw <- forecast(HoltWinters(myts), h=20)
+    fcsthwcc <- extTryCatch(HoltWinters(myts))
+    if (is.null(fcsthwcc$error[1])){
+      fcsthwc <- fcsthwcc} else {
+        result$hwname <- "ets AAN"
+        fcsthwc <- ets(y=myts,model="AAN")
+      }
   }
   else{
     c <- extTryCatch(tsoutliers::tso( y = myts, types = c("AO",  "TC", "SLS"),
@@ -133,8 +162,12 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency){
     fcstatc <- extTryCatch(forecast::auto.arima(thets))
     fcstainttc <- extTryCatch(forecast::auto.arima(thetsint, lambda = 0))
     fcstlftc <- extTryCatch(stlf(thets, lambda=BoxCox.lambda(thets)))
-    fcsthw <- forecast(HoltWinters(thets), h=20)
-
+    fcsthwcc <- extTryCatch(HoltWinters(thets))
+    if (is.null(fcsthwcc$error[1])){
+      fcsthwc <- fcsthwcc} else {
+        result$hwname <- "ets AAN"
+        fcsthwc <- extTryCatch(ets(y=thets,model="AAN"))
+      }
   }
 
     if(is.null(fcstatc$error[1])){
@@ -158,11 +191,14 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency){
       result$stlffc <- forecast(fcstlf, h= 20)
       result$stlferror <- "succes"}
     else {result$stlferror <- fcstlftc$error[1]}
-
-    result$hw <- forecast::accuracy(fcsthw)
-    result$hwlimited <- limited_accuracy(myts, fcsthw, thefrequency, accuracyperiods )
-    result$hwfc <- fcsthw
-    result$hwerror <- "succes"
+  if(is.null(fcsthwc$error[1])){
+    fcsthwv <- fcsthwc$value
+    #result$hwfv <- fcsthwv
+    result$hwfc <- forecast(fcsthwv, h=20)
+    result$hw <- forecast::accuracy(result$hwfc)
+    result$hwlimited <- limited_accuracy(myts, fcsthwv, thefrequency, accuracyperiods )
+    result$hwerror <- "succes"}
+    else {result$hwerror <- fcsthwc$error[1]}
 
   status$status <- "Completed"
   status$message <- "Completed"
