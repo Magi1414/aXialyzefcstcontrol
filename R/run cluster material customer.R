@@ -12,7 +12,7 @@ con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
 df <- dbGetQuery(con, "SELECT material, cluster, customer_code, totalvolume,  ts_categorie
-                 FROM public.sandop_selection order by totalvolume desc limit 50" )
+                 FROM public.sandop_selection order by totalvolume desc" )
 # Calculate the number of cores
 no_cores <- detectCores() - 1
 
