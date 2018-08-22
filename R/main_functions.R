@@ -35,25 +35,25 @@ write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org
   if (is.null(fcaccuracy$error[1])) {
     errorstatus <- "completed"} else {errorstatus <- fcaccuracy$error[1]}
 
-    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$arimauuid),"Null",fcaccuracy$value$arimauuid), ilevel,fcaccuracy$value$arimaname,phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$arimauuid),"Null",fcaccuracy$value$arimauuid), ilevel,ifelse(is.null(fcaccuracy$value$arimaname),"Null",fcaccuracy$value$arimaname),phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$arima[5]),"Null",fcaccuracy$value$arima[5]),ifelse(is.null(fcaccuracy$value$arima[6]),"Null",fcaccuracy$value$arima[6]),
                                              ifelse(is.null(fcaccuracy$value$arimalimited[[5]]),"Null",fcaccuracy$value$arimalimited[[5]]),ifelse(is.null(fcaccuracy$value$arimalimited$MASE),"Null",fcaccuracy$value$arimalimited$MASE),
                                              ifelse(is.null(fcaccuracy$value$arimalimited[[7]]),"Null",fcaccuracy$value$arimalimited[[7]]),
                                              ifelse(is.null(fcaccuracy$value$arimalimited$FCA),"Null",fcaccuracy$value$arimalimited$FCA), datex,datet,errorstatus,  ifelse(is.null(fcaccuracy$value$arimaerror), "Null", fcaccuracy$value$arimaerror),ifelse(is.null(fcaccuracy$value$totalvolume),0, fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
-    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$stlfuuid),"Null",fcaccuracy$value$stlfuuid) , ilevel, fcaccuracy$value$stlfname, phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$stlfuuid),"Null",fcaccuracy$value$stlfuuid) , ilevel, ifelse(is.null(fcaccuracy$value$stlfname),"Null",fcaccuracy$value$stlfname), phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$stlf[5]),"Null",fcaccuracy$value$stlf[5]), ifelse(is.null(fcaccuracy$value$stlf[6]),"Null",fcaccuracy$value$stlf[6]),
                                              ifelse(is.null(fcaccuracy$value$stlflimited[[5]]),"Null",fcaccuracy$value$stlflimited[[5]]), ifelse(is.null(fcaccuracy$value$stlflimited$MASE),"Null",fcaccuracy$value$stlflimited$MASE),
                                              ifelse(is.null(fcaccuracy$value$stlflimited[[7]]),"Null",fcaccuracy$value$stlflimited[[7]]),
                                              ifelse(is.null(fcaccuracy$value$stlflimited$FCA),"Null",fcaccuracy$value$stlflimited$FCA), datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$stlferror), "Null", fcaccuracy$value$stlferror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
-    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$hwuuid),"Null",fcaccuracy$value$hwuuid), ilevel, fcaccuracy$value$hwname, phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$hwuuid),"Null",fcaccuracy$value$hwuuid), ilevel, ifelse(is.null(fcaccuracy$value$hwname),"Null",fcaccuracy$value$hwname), phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$hw[5]),"Null",fcaccuracy$value$hw[5]), ifelse(is.null(fcaccuracy$value$hw[6]),"Null",fcaccuracy$value$hw[6]),
                                              ifelse(is.null(fcaccuracy$value$hwlimited[[5]]),"Null",fcaccuracy$value$hwlimited[[5]]), ifelse(is.null(fcaccuracy$value$hwlimited$MASE),"Null",fcaccuracy$value$hwlimited$MASE),
                                              ifelse(is.null(fcaccuracy$value$hwlimited[[7]]),"Null",fcaccuracy$value$hwlimited[[7]]),
                                              ifelse(is.null(fcaccuracy$value$hwlimited$FCA),"Null",fcaccuracy$value$hwlimited$FCA), datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$hwerror), "Null", fcaccuracy$value$hwerror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
-    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$arimaintuuid),"Null",fcaccuracy$value$arimaintuuid) ,ilevel, fcaccuracy$value$arimaintname, phantom, org_level ,
+    dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$arimaintuuid),"Null",fcaccuracy$value$arimaintuuid) ,ilevel, ifelse(is.null(fcaccuracy$value$arimaintname),"Null",fcaccuracy$value$arimaintname), phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$arimaint[5]),"Null",fcaccuracy$value$arimaint[5]), ifelse(is.null(fcaccuracy$value$arimaint[6]),"Null",fcaccuracy$value$arimaint[6]),
                                              ifelse(is.null(fcaccuracy$value$arimaintlimited[[5]]),"Null",fcaccuracy$value$arimaintlimited[[5]]), ifelse(is.null(fcaccuracy$value$arimaintlimited$MASE),"Null",fcaccuracy$value$arimaintlimited$MASE),
                                              ifelse(is.null(fcaccuracy$value$arimaintlimited[[7]]),"Null",fcaccuracy$value$arimaintlimited[[7]]),
