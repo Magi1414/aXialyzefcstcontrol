@@ -18,9 +18,10 @@ write_fcdata_todbx <- function(position, connectionx, x, uuidx, fcperiodx){
   qry = "INSERT INTO public.forecast_r(
   date_created, forecastperiod, forecast_forperiodplus, forecast_uuid,
   fcvalue)
-  VALUES (  now(), $1,$2,$3, $4)"
-  dbs <- dbSendQuery(connectionx, qry, c(fcperiodx, position, uuidx,  x[position]))
-  dbClearResult(dbs)
+  VALUES (  now(), $1,$2,$3, case when $4 ilike '%NA%' then null else $4 end::double precision)"
+  dbs <-  extTryCatch( dbSendQuery(connectionx, qry, c(fcperiodx, position, uuidx, x[position] )))
+  if (is.null(dbs$value)==FALSE){dbClearResult(dbs$value)}
+  #no need to print -->if (is.null(fcsthwcc$error[1])==FALSE){print }
 }
 
 write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org_level, iYYYY, fcperiod, sendseriedetails, fcrun){

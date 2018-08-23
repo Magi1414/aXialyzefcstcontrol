@@ -13,8 +13,8 @@ con <- dbConnect(drv, dbname = "Atotech",
                  user = "aXialyze", password = "aXialyze0000")
 df <- dbGetQuery(con, "SELECT material, cluster,  customer_code, totalvolume,  ts_categorie
                  FROM public.sandop_selection
-                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20180822-1')
-                 order by totalvolume desc limit 50" )
+                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20180822-2')and totalvolume > 250
+                 order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(customer_code,10,'0') customer_code, totalvolume,  ts_categorie
 #FROM public.sandop_selection
@@ -42,7 +42,7 @@ run_mat_cust_mm <- function(df, no_cores) {
       if(batchsize*(i+1) > nrow(df)){endnr <- nrow(df) }else {endnr <-  batchsize*i}
       dfall <- df[startnr:endnr, ]
       level <- "material_customer_Continous"
-      fcrun <- "20180822-1"
+      fcrun <- "20180822-2"
      apply(dfall, 1, f_mat_cust, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "07.2018", TRUE, fcrun)
     }}
 # Initiate cluster
