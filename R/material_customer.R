@@ -16,10 +16,10 @@ f_mat_cust <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcseri
  # print(x[1])
 }
 
-fcstMat_cust <- function( connection , Phantom, org_level, customer, query,  intermittent, DateMask, yrfreq, status) {
+fcstMat_cust <- function( connection , Phantom, org_level, customer, query,  intermittent, DateMask, yrfreq, status, todate) {
 
 
-  df_postgres <- RPostgreSQL::dbGetQuery(connection,  query, c(Phantom, org_level, DateMask, customer))
+  df_postgres <- RPostgreSQL::dbGetQuery(connection,  query, c(Phantom, org_level, DateMask, customer, todate))
 print (df_postgres)
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
