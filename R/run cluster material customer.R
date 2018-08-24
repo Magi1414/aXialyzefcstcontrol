@@ -13,7 +13,7 @@ con <- dbConnect(drv, dbname = "Atotech",
                  user = "aXialyze", password = "aXialyze0000")
 df <- dbGetQuery(con, "SELECT material, cluster,  customer_code, totalvolume,  ts_categorie
                  FROM public.sandop_selection
-                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20180822-2')and totalvolume > 250
+                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20180701-1') and totalvolume <=  250 and totalvolume >= 92
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(customer_code,10,'0') customer_code, totalvolume,  ts_categorie
@@ -42,8 +42,9 @@ run_mat_cust_mm <- function(df, no_cores) {
       if(batchsize*(i+1) > nrow(df)){endnr <- nrow(df) }else {endnr <-  batchsize*i}
       dfall <- df[startnr:endnr, ]
       level <- "material_customer_Continous"
-      fcrun <- "20180822-2"
-     apply(dfall, 1, f_mat_cust, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "07.2018", TRUE, fcrun)
+      fcrun <- "20180701-1"
+      todate <- "2018-06-30"  #parameter for last date of history to take into account
+     apply(dfall, 1, f_mat_cust, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "06.2018", TRUE, fcrun, todate)
     }}
 # Initiate cluster
 cl <- makeCluster(no_cores)
