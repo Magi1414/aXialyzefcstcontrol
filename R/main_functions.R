@@ -110,9 +110,9 @@ computeFCA <- function(forecast,test){
   forecast <- as.vector(forecast)
   test <- as.vector(test)
 
-  et <- ifelse(test == 0,ifelse(forecast == 0 , 0,1) , abs(test-forecast)/test)*pmax(test,1)
+  et <- ifelse(test == 0,ifelse(forecast == 0 , 0,1) , abs(test-forecast)/abs(test))*pmax(test,1)
   FCerror <- sum(et)/sum(pmax(test,1))
-  return(1-FCerror)
+  return(max(0,1-FCerror))
 }
 
 limited_accuracy <- function(myts,fc, pfrequency, testperiods){
