@@ -12,8 +12,9 @@ con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
 df <- dbGetQuery(con, "SELECT material, cluster,  sales_organization , totalvolume,  ts_categorie
-                 FROM public.sandop_selection_region where cluster = 'China'
-                 and not material || sales_organization in (select material || geography from fcst_accuracy where fcrun = '20180831-1')
+                 FROM public.sandop_selection_region s where cluster = 'China'
+                 and not exists  (select material || geography from fcst_accuracy f where fcrun = '20180831-1'
+                 and f.material = s.material and left(geography,4) = sales_organization)
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
