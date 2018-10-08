@@ -11,9 +11,10 @@ drv <- dbDriver("PostgreSQL")
 con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
-df <- dbGetQuery(con, "SELECT material, cluster,  customer_code, totalvolume,  ts_categorie
+df <- dbGetQuery(con, "SELECT material, cluster,  customer_code, totalvolume,  ts_categorie, case when sma_only then 1 else 0 end
                  FROM public.sandop_selection
-                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20180301-1')
+                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20181003-1')
+                   and not (division = '01' AND cluster = 'China')
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
@@ -31,8 +32,8 @@ run_mat_cust_mm <- function(df, no_cores) {
       require("tsoutliers")
       require(ggplot2)
       require("tsintermittent")
-      source('~/aXialyzefcstcontrol/R/main_functions.R')
-      source('~/aXialyzefcstcontrol/R/material_customer.R')
+      source('~/R/aXialyzefcstcontrol/R/main_functions.R')
+      source('~/R/aXialyzefcstcontrol/R/material_customer.R')
       drv <- dbDriver("PostgreSQL")
       con <- dbConnect(drv, dbname = "Atotech",
                        host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
@@ -42,9 +43,9 @@ run_mat_cust_mm <- function(df, no_cores) {
       if(batchsize*(i+1) > nrow(df)){endnr <- nrow(df) }else {endnr <-  batchsize*i}
       dfall <- df[startnr:endnr, ]
       level <- "material_customer_Continous"
-      fcrun <- "20180301-1"
-      todate <- "2018-02-31"  #parameter for last date of history to take into account
-     apply(dfall, 1, f_mat_cust, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "03.2018", TRUE, fcrun, todate)
+      fcrun <- "20181003-1"
+      todate <- "2018-09-30"  #parameter for last date of history to take into account
+      apply(dfall, 1, f_mat_cust, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "09.2018", TRUE, fcrun, todate)
     }}
 # Initiate cluster
 cl <- makeCluster(no_cores)

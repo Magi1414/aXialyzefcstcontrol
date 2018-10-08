@@ -1,7 +1,7 @@
 f_mat_cluster <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcserie, fcrun, todate) {
   phantom <- x[1]
   iorg_level <- x[2]
-
+  sma_only <- x[6]
 
   print(phantom)
   print (iorg_level)
@@ -12,11 +12,11 @@ f_mat_cluster <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcs
   fcaccuracy <- extTryCatch(fcstMat_cluster(connection , phantom, iorg_level,  iquery, FALSE, iYYYY, ifreq , status_message, todate))
   #print(x[1])
   #print(fcaccuracy)
-  write_fcobject_todb(connection, fcaccuracy, ilevel, phantom, iorg_level, iYYYY, fcperiod, sendfcserie, fcrun)
+  write_fcobject_todb(connection, fcaccuracy, ilevel, phantom, iorg_level, iYYYY, fcperiod, sendfcserie, fcrun,sma_only)
   # print(x[1])
 }
 
-fcstMat_cluster <- function( connection , Phantom, org_level, query,  intermittent, DateMask, yrfreq, status, todate) {
+fcstMat_cluster <- function( connection , Phantom, org_level, query,  intermittent, sma_only, DateMask, yrfreq, status, todate) {
 
 
   df_postgres <- RPostgreSQL::dbGetQuery(connection,  query, c(Phantom, org_level, DateMask, todate))
@@ -24,7 +24,7 @@ fcstMat_cluster <- function( connection , Phantom, org_level, query,  intermitte
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
 
-  returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq)
+  returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq, sma_only)
   returnobject$totalvolume = sum(myts)
   returnobject$ts <- myts
   status$status <- "Completed"

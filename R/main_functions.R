@@ -24,7 +24,7 @@ write_fcdata_todbx <- function(position, connectionx, x, uuidx, fcperiodx){
   #no need to print -->if (is.null(fcsthwcc$error[1])==FALSE){print }
 }
 
-write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org_level, iYYYY, fcperiod, sendseriedetails, fcrun){
+write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org_level, iYYYY, fcperiod, sendseriedetails, fcrun,sma_only){
   qry = "insert into fcst_accuracy (fcrun, uuid, fcst_accuracy_measurement,
                                    fcst_method, material,
                                    geography, MAPE, mase, mape_limited, mase_limited, theilu_limited, fca_limited, created_date,
@@ -35,7 +35,7 @@ write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org
 
   if (is.null(fcaccuracy$error[1])) {
     errorstatus <- "completed"} else {errorstatus <- fcaccuracy$error[1]}
-
+    if (!sma_only) {# LpM no need to save what I didn't compute
     dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$arimauuid),"Null",fcaccuracy$value$arimauuid), ilevel,ifelse(is.null(fcaccuracy$value$arimaname),"Null",fcaccuracy$value$arimaname),phantom, org_level ,
                                              ifelse(is.null(fcaccuracy$value$arima[5]),"Null",fcaccuracy$value$arima[5]),ifelse(is.null(fcaccuracy$value$arima[6]),"Null",fcaccuracy$value$arima[6]),
                                              ifelse(is.null(fcaccuracy$value$arimalimited[[5]]),"Null",fcaccuracy$value$arimalimited[[5]]),ifelse(is.null(fcaccuracy$value$arimalimited$MASE),"Null",fcaccuracy$value$arimalimited$MASE),
@@ -60,6 +60,15 @@ write_fcobject_todb <- function(connectionpga, fcaccuracy, ilevel, phantom,  org
                                              ifelse(is.null(fcaccuracy$value$arimaintlimited[[7]]),"Null",fcaccuracy$value$arimaintlimited[[7]]),
                                              ifelse(is.null(fcaccuracy$value$arimaintlimited$FCA),"Null",fcaccuracy$value$arimaintlimited$FCA),datex,datet, errorstatus, ifelse(is.null(fcaccuracy$value$arimainterror), "Null", fcaccuracy$value$arimainterror), ifelse(is.null(fcaccuracy$value$totalvolume),0,fcaccuracy$value$totalvolume), iYYYY, fcperiod))
     dbClearResult(dbs)
+    }
+    # LpM always try and save the moving average
+  dbs <- dbSendQuery(connectionpga, qry, c(fcrun, ifelse(is.null(fcaccuracy$value$mauuid),"Null",fcaccuracy$value$mauuid), ilevel,ifelse(is.null(fcaccuracy$value$maname),"Null",fcaccuracy$value$maname),phantom, org_level ,
+                                           ifelse(is.null(fcaccuracy$value$ma[5]),"Null",fcaccuracy$value$ma[5]),ifelse(is.null(fcaccuracy$value$ma[6]),"Null",fcaccuracy$value$ma[6]),
+                                           ifelse(is.null(fcaccuracy$value$malimited[[5]]),"Null",fcaccuracy$value$malimited[[5]]),ifelse(is.null(fcaccuracy$value$malimited$MASE),"Null",fcaccuracy$value$malimited$MASE),
+                                           ifelse(is.null(fcaccuracy$value$malimited[[7]]),"Null",fcaccuracy$value$malimited[[7]]),
+                                           ifelse(is.null(fcaccuracy$value$malimited$FCA),"Null",fcaccuracy$value$malimited$FCA), datex,datet,errorstatus,  ifelse(is.null(fcaccuracy$value$maerror), "Null", fcaccuracy$value$maerror),ifelse(is.null(fcaccuracy$value$totalvolume),0, fcaccuracy$value$totalvolume), iYYYY, fcperiod))
+  dbClearResult(dbs)
+
 
 if(sendseriedetails ){
   fsarima <- fcaccuracy$value$arimafc$mean
@@ -78,6 +87,10 @@ if(sendseriedetails ){
   fsi <- fcaccuracy$value$arimaintfc$mean
   if(is.null(fsi)==FALSE){
     lapply(1:length(fsi), write_fcdata_todbx, connectionpga, fsi, fcaccuracy$value$arimaintuuid, fcperiod)
+  }
+  fsma <- fcaccuracy$value$mafc$mean
+  if(is.null(fsma)==FALSE){
+    lapply(1:length(fsma), write_fcdata_todbx, connectionpga, fsma, fcaccuracy$value$mauuid, fcperiod)
   }
 }
 }
@@ -128,19 +141,21 @@ limited_accuracy <- function(myts,fc, pfrequency, testperiods){
   return(ac)
 }
 
-fcstgetAccuracy <- function(myts, intermittent, status, thefrequency){
+fcstgetAccuracy <- function(myts, intermittent, status, thefrequency, sma_only){
   accuracyperiods <- 3
   result <- 1
   result$stlfuuid <-  UUIDgenerate(use.time=NA)
   result$hwuuid <-  UUIDgenerate(use.time=NA)
   result$arimauuid <-  UUIDgenerate(use.time=NA)
   result$arimaintuuid <-  UUIDgenerate(use.time=NA)
+  result$mauuid <-  UUIDgenerate(use.time=NA)
   result$arimaintname <- "arima int"
   result$arimaname <- "auto.arima"
   result$stlfname <- "stlf"
   result$hwname <- "hw"
+  result$maname <- "moving average"
 
-  if(intermittent == TRUE){
+  if(intermittent == TRUE){ # LpM add test on not sma_only
     fcstatc <- extTryCatch(forecast::auto.arima(myts))
     fcstainttc <- extTryCatch(tsintermittent::imapa(myts))
     result$arimaintname <- "imapa"
@@ -152,7 +167,8 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency){
         fcsthwc <- ets(y=myts,model="AAN")
       }
   }
-  else{
+  else{ # LpM add test on not sma_only
+    if (!sma_only) { # Don't loose time on items were only simple moving average is required
     c <- extTryCatch(tsoutliers::tso( y = myts, types = c("AO",  "TC", "SLS"),
           maxit = 1, discard.method = "en-masse", tsmethod = "auto.arima"))
     cint <- extTryCatch(tsoutliers::tso( y = myts, types = c("AO",  "TC", "SLS"),
@@ -169,16 +185,26 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency){
         result$hwname <- "ets AAN"
         fcsthwc <- extTryCatch(ets(y=thets,model="AAN"))
       }
+    }
+    # always try moving average
+    fcstmac <- extTryCatch(forecast::ma(myts,3,TRUE))
   }
 
-    if(is.null(fcstatc$error[1])){
-        fcsta <- fcstatc$value
-        result$arimafc <- forecast(fcsta, h= 20)
-        result$arima <- accuracy(fcsta)
-        result$arimalimited <- limited_accuracy(myts, fcsta, thefrequency, accuracyperiods )
-        result$arimaerror <- "succes"}
-    else {result$arimaerror <- fcstatc$error[1]}
-    if(is.null(fcstainttc$error[1])){
+    if(is.null(fcstmac$error[1])){ #LpM added Moving Average
+        fcstma <- fcstmac$value
+        result$mafc <- forecast(fcstma, h= 20)
+        result$ma <- accuracy(result$mafc)
+        result$malimited <- limited_accuracy(myts, result$mafc, thefrequency, accuracyperiods )
+        result$maerror <- "succes"}
+    else {result$maerror <- fcstmac$error[1]}
+  if(is.null(fcstatc$error[1])){
+    fcsta <- fcstatc$value
+    result$arimafc <- forecast(fcsta, h= 20)
+    result$arima <- accuracy(fcsta)
+    result$arimalimited <- limited_accuracy(myts, fcsta, thefrequency, accuracyperiods )
+    result$arimaerror <- "succes"}
+  else {result$arimaerror <- fcstatc$error[1]}
+  if(is.null(fcstainttc$error[1])){
       fcstaint <- fcstainttc$value
       result$arimaint <- forecast::accuracy(fcstaint)
       result$arimaintlimited <- limited_accuracy(myts, fcstaint, thefrequency, accuracyperiods )

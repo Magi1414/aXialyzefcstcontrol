@@ -2,21 +2,25 @@ f_mat_cust <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcseri
   phantom <- x[1]
   iorg_level <- x[2]
   customer <- x[3]
+
   print(customer)
   print(phantom)
   print (iorg_level)
+  sma_only = FALSE
+  if (x[6] == 1 ) {sma_only <- TRUE} else {sma_only <- FALSE} 
+  print(sma_only)
   status_message <- 0
   status_message$status <- 'Initialized'
   status_message$message <- 'Initialized'
   iquery <- "select requested_deliv_date,liters from get_orderqtyvalue_per_date_inclmaterial_cluster_payer($1,$2,$3,$4, $5)"
-  fcaccuracy <- extTryCatch(fcstMat_cust(connection , phantom, iorg_level, customer, iquery, FALSE, iYYYY, ifreq , status_message, todate))
+  fcaccuracy <- extTryCatch(fcstMat_cust(connection , phantom, iorg_level, customer, iquery, FALSE, sma_only, iYYYY, ifreq , status_message, todate))
   #print(x[1])
   #print(fcaccuracy)
-  write_fcobject_todb(connection, fcaccuracy, ilevel, phantom, paste(customer,paste(" - " ,iorg_level)), iYYYY, fcperiod, sendfcserie, fcrun)
+  write_fcobject_todb(connection, fcaccuracy, ilevel, phantom, paste(customer,paste(" - " ,iorg_level)), iYYYY, fcperiod, sendfcserie, fcrun,sma_only)
  # print(x[1])
 }
 
-fcstMat_cust <- function( connection , Phantom, org_level, customer, query,  intermittent, DateMask, yrfreq, status, todate) {
+fcstMat_cust <- function( connection , Phantom, org_level, customer, query,  intermittent, sma_only, DateMask, yrfreq, status, todate) {
 
 
   df_postgres <- RPostgreSQL::dbGetQuery(connection,  query, c(Phantom, org_level, DateMask, customer, todate))
@@ -24,7 +28,7 @@ print (df_postgres)
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
 
-  returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq)
+  returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq, sma_only)
   returnobject$totalvolume = sum(myts)
   returnobject$ts <- myts
   status$status <- "Completed"

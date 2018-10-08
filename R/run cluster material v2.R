@@ -11,9 +11,10 @@ drv <- dbDriver("PostgreSQL")
 con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
-df <- dbGetQuery(con, "SELECT material, cluster, totalvolume,  ts_categorie
-                 FROM public.sandop_selection_cluster where cluster = 'China'
-                 and not material || cluster in (select material || geography from fcst_accuracy where fcrun = '20180831-2')
+df <- dbGetQuery(con, "SELECT material, cluster, totalvolume,  ts_categorie, sma_only
+                 FROM public.sandop_selection_cluster 
+                 where not material || cluster in (select material || geography from fcst_accuracy where fcrun = '20181003-1')
+                 AND not (division = '01' AND cluster = 'China')
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
