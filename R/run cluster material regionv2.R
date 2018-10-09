@@ -16,7 +16,7 @@ df <- dbGetQuery(con, "SELECT material, cluster,  sales_organization , totalvolu
                  where
                  not exists  (select material || geography from fcst_accuracy f where fcrun = '20181003-4'
                  and f.material = s.material and left(geography,4) = sales_organization ) and
-                 division = '01' AND cluster = 'China'
+                 division = '01' AND cluster = 'China' and totalvolume >= 3500
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie

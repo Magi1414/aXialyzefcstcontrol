@@ -154,8 +154,10 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency, sma_only){
   result$stlfname <- "stlf"
   result$hwname <- "hw"
   result$maname <- "moving average"
-
-  if(intermittent == TRUE){ # LpM add test on not sma_only
+  # always try moving average
+  fcstmac <- extTryCatch(forecast::ma(myts,3,TRUE))
+if(sma_only==FALSE){
+  if(intermittent == TRUE ){ # LpM add test on not sma_only
     fcstatc <- extTryCatch(forecast::auto.arima(myts))
     fcstainttc <- extTryCatch(tsintermittent::imapa(myts))
     result$arimaintname <- "imapa"
@@ -168,7 +170,7 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency, sma_only){
       }
   }
   else{ # LpM add test on not sma_only
-    if (!sma_only) { # Don't loose time on items were only simple moving average is required
+   # Don't loose time on items were only simple moving average is required
     c <- extTryCatch(tsoutliers::tso( y = myts, types = c("AO",  "TC", "SLS"),
           maxit = 1, discard.method = "en-masse", tsmethod = "auto.arima"))
     cint <- extTryCatch(tsoutliers::tso( y = myts, types = c("AO",  "TC", "SLS"),
@@ -185,18 +187,8 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency, sma_only){
         result$hwname <- "ets AAN"
         fcsthwc <- extTryCatch(ets(y=thets,model="AAN"))
       }
-    }
-    # always try moving average
-    fcstmac <- extTryCatch(forecast::ma(myts,3,TRUE))
-  }
 
-    if(is.null(fcstmac$error[1])){ #LpM added Moving Average
-        fcstma <- fcstmac$value
-        result$mafc <- forecast(fcstma, h= 20)
-        result$ma <- accuracy(result$mafc)
-        result$malimited <- limited_accuracy(myts, result$mafc, thefrequency, accuracyperiods )
-        result$maerror <- "succes"}
-    else {result$maerror <- fcstmac$error[1]}
+
   if(is.null(fcstatc$error[1])){
     fcsta <- fcstatc$value
     result$arimafc <- forecast(fcsta, h= 20)
@@ -226,7 +218,14 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency, sma_only){
     result$hwlimited <- limited_accuracy(myts, fcsthwv, thefrequency, accuracyperiods )
     result$hwerror <- "succes"}
     else {result$hwerror <- fcsthwc$error[1]}
-
+  }}
+  if(is.null(fcstmac$error[1])){ #LpM added Moving Average
+    fcstma <- fcstmac$value
+    result$mafc <- forecast(fcstma, h= 20)
+    result$ma <- accuracy(result$mafc)
+    result$malimited <- limited_accuracy(myts, result$mafc, thefrequency, accuracyperiods )
+    result$maerror <- "succes"}
+  else {result$maerror <- fcstmac$error[1]}
   status$status <- "Completed"
   status$message <- "Completed"
 
