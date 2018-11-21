@@ -13,8 +13,8 @@ con <- dbConnect(drv, dbname = "Atotech",
                  user = "aXialyze", password = "aXialyze0000")
 df <- dbGetQuery(con, "SELECT material, cluster,  customer_code, totalvolume,  ts_categorie, case when sma_only then 1 else 0 end
                  FROM public.sandop_selection
-                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20181003-1')
-                 and not (division = '01' AND cluster = 'China') and totalvolume >= 600
+                 where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = '20181104-2')
+                 and not (division = '01' AND cluster = 'China') and totalvolume > 20
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie

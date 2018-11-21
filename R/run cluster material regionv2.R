@@ -14,9 +14,9 @@ con <- dbConnect(drv, dbname = "Atotech",
 df <- dbGetQuery(con, "SELECT material, cluster,  sales_organization , totalvolume,  ts_categorie, case when sma_only then 1 else 0 end
                  FROM public.sandop_selection_region s
                  where
-                 not exists  (select material || geography from fcst_accuracy f where fcrun = '20181003-4'
-                 and f.material = s.material and left(geography,4) = sales_organization ) and
-                 division = '01' AND cluster = 'China' and totalvolume >= 3500
+                 not exists  (select material || geography from fcst_accuracy f where fcrun = '20181104-2'
+                 and f.material = s.material and left(geography,4) = sales_organization )
+                 AND prod_group ilike '1%' and not prod_group = '106' and cluster = 'China' and totalvolume > 0
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
@@ -45,9 +45,9 @@ run_mat_cust_mm <- function(df, no_cores) {
       if(batchsize*(i+1) > nrow(df)){endnr <- nrow(df) }else {endnr <-  batchsize*i}
       dfall <- df[startnr:endnr, ]
       level <- "material_region_Continous"
-      fcrun <- "20181003-4"
-      todate <- "2018-09-30"  #parameter for last date of history to take into account
-     apply(dfall, 1, f_mat_regi, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "09.2018", TRUE, fcrun, todate)
+      fcrun <- "20181104-2"
+      todate <- "2018-10-31"  #parameter for last date of history to take into account
+     apply(dfall, 1, f_mat_regi, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, "10.2018", TRUE, fcrun, todate)
     }}
 # Initiate cluster
 cl <- makeCluster(no_cores)
