@@ -178,14 +178,15 @@ if(sma_only==FALSE){
           args.tsmethod = list(lambda=0)))
     if (is.null(c$error[1])) {thets <- c$value$yadj} else {thets <- myts}
     if (is.null(cint$error[1])) {thetsint <- cint$value$yadj} else {thetsint <- myts}
+    if (is.null(cts$error[1])) {thetsc <- cts$value} else {thetsc <- myts}
     fcstatc <- extTryCatch(forecast::auto.arima(thets))
     fcstainttc <- extTryCatch(forecast::auto.arima(thetsint, lambda = 0))
-    fcstlftc <- extTryCatch(stlf(thets, lambda=BoxCox.lambda(thets)))
-    fcsthwcc <- extTryCatch(HoltWinters(thets))
+    fcstlftc <- extTryCatch(stlf(thetsc, lambda=BoxCox.lambda(thetsc)))
+    fcsthwcc <- extTryCatch(HoltWinters(thetsc))
     if (is.null(fcsthwcc$error[1])){
       fcsthwc <- fcsthwcc} else {
         result$hwname <- "ets AAN"
-        fcsthwc <- extTryCatch(ets(y=thets,model="AAN"))
+        fcsthwc <- extTryCatch(ets(y=thetsc,model="AAN"))
       }
 
 
