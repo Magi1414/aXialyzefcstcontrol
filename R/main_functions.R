@@ -176,6 +176,7 @@ if(sma_only==FALSE){
     cint <- extTryCatch(tsoutliers::tso( y = myts, types = c("AO",  "TC", "SLS"),
           maxit = 1, discard.method = "en-masse", tsmethod = "auto.arima",
           args.tsmethod = list(lambda=0)))
+    cts <- extTryCatch(tsclean(myts))
     if (is.null(c$error[1])) {thets <- c$value$yadj} else {thets <- myts}
     if (is.null(cint$error[1])) {thetsint <- cint$value$yadj} else {thetsint <- myts}
     if (is.null(cts$error[1])) {thetsc <- cts$value} else {thetsc <- myts}
