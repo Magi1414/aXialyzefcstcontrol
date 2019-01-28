@@ -19,7 +19,7 @@ f_mat_cluster <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcs
 fcstMat_cluster <- function( connection , Phantom, org_level, query,  intermittent, sma_only, DateMask, yrfreq, status, todate) {
 
 
-  df_postgres <- RPostgreSQL::dbGetQuery(connection,  query, c(Phantom, org_level, DateMask, todate))
+  c(Phantom, org_level, DateMask, todate)
   print (df_postgres)
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
