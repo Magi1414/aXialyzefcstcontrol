@@ -199,7 +199,7 @@ fcstgetAccuracy <- function(myts, intermittent, status, thefrequency, sma_only){
       if (is.null(cts$error[1])) {thetsc <- cts$value} else {thetsc <- myts}
       fcstatc <- extTryCatch(forecast::auto.arima(thets))
       fcstainttc <- extTryCatch(forecast::auto.arima(thetsint, lambda = 0))
-      fcstlftc <- extTryCatch(stlf(thetsc, lambda=BoxCox.lambda(thetsc)))
+      fcstlftc <- extTryCatch(stlf(thetsc, lambda=BoxCox.lambda(thetsc), h=20))
       fcsthwc <- extTryCatch(HoltWinters(thetsc))
       fcstetsc <- extTryCatch(ets(y=thetsc,model="ZZZ"))
 

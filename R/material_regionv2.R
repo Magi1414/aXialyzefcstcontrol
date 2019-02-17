@@ -25,7 +25,7 @@ fcstMat_region <- function( connection , Phantom, org_level, region, query,  int
   print (df_postgres)
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
-  myts <- myts[cumsum(myts)!=0]
+  ##myts <- myts[cumsum(myts)!=0]
   returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq,sma_only)
   returnobject$totalvolume = sum(myts)
   returnobject$ts <- myts
