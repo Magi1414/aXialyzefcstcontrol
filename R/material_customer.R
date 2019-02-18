@@ -7,7 +7,7 @@ f_mat_cust <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcseri
   print(phantom)
   print (iorg_level)
   sma_only = FALSE
-  if (x[6] == 1 ) {sma_only <- TRUE} else {sma_only <- FALSE} 
+  if (x[6] == 1 ) {sma_only <- TRUE} else {sma_only <- FALSE}
   print(sma_only)
   status_message <- 0
   status_message$status <- 'Initialized'
@@ -27,7 +27,7 @@ fcstMat_cust <- function( connection , Phantom, org_level, customer, query,  int
 print (df_postgres)
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
-
+  ##mytss <- myts[cumsum(myts)!=0]
   returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq, sma_only)
   returnobject$totalvolume = sum(myts)
   returnobject$ts <- myts

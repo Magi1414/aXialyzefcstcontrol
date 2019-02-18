@@ -14,7 +14,7 @@ con <- dbConnect(drv, dbname = "Atotech",
 df <- dbGetQuery(con, "SELECT material, cluster,  customer_code, totalvolume,  ts_categorie, case when sma_only then 1 else 0 end
                  FROM public.sandop_selection
                  where not material || customer_code in (select material || left(geography,10) from fcst_accuracy where fcrun = (SeLECT fcrun FROM current_run))
-                 and not (prod_group ilike '1%' and not prod_group = '106' and cluster = 'China') and totalvolume > 400  and totalvolume <= 1000
+                 and not (prod_group ilike '1%' and not prod_group = '106' and cluster = 'China')
                  order by totalvolume desc " )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie

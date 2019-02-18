@@ -3,7 +3,7 @@ f_mat_regi <- function(x, connection, ilevel, iYYYY, ifreq, fcperiod, sendfcseri
   iorg_level <- x[2]
   region <- x[3]
   sma_only = FALSE
-  if (x[6] == 1 ) {sma_only <- TRUE} else {sma_only <- FALSE}  
+  if (x[6] == 1 ) {sma_only <- TRUE} else {sma_only <- FALSE}
   print(region)
   print(phantom)
   print (iorg_level)
@@ -25,7 +25,7 @@ fcstMat_region <- function( connection , Phantom, org_level, region, query,  int
   print (df_postgres)
   myts <- ts(df_postgres[ ,2], start = c(2015, 1), frequency = yrfreq)
   ##return (myts)
-
+  ##myts <- myts[cumsum(myts)!=0]
   returnobject <- fcstgetAccuracy(myts, intermittent, status, yrfreq,sma_only)
   returnobject$totalvolume = sum(myts)
   returnobject$ts <- myts

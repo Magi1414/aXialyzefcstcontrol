@@ -16,8 +16,8 @@ df <- dbGetQuery(con, "SELECT material, cluster,  sales_organization , totalvolu
                  where
                  not exists  (select material || geography from fcst_accuracy f where fcrun = (select fcrun_gmf from current_run)
                  and f.material = s.material and left(geography,4) = sales_organization )
-                 AND --prod_group ilike '1%' and not prod_group = '106' and
-                 cluster = 'Germany' and totalvolume >= 0
+                 AND prod_group ilike '1%' and not prod_group = '106' and
+                 cluster = 'China' and totalvolume >= 0
                  order by totalvolume desc" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
@@ -50,7 +50,7 @@ run_mat_cust_mm <- function(df, no_cores) {
     if(batchsize*(i+1) > nrow(df)){endnr <- nrow(df) }else {endnr <-  batchsize*i}
     dfall <- df[startnr:endnr, ]
     level <- "material_region_Continous"
-    fcrun <- df2[,"20190115-1"]
+    fcrun <- df2[,"fcrun"]
     todate <- df2[,"requested_deliv_date_to"]  #parameter for last date of history to take into account
     fcperiod <- df2[,"fcperiod"]
     apply(dfall, 1, f_mat_regi, connection = con, ilevel = level,  iYYYY = "YYYY-MM"  ,ifreq = 12, fcperiod, TRUE, fcrun, todate)
