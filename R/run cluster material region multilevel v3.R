@@ -11,17 +11,33 @@ drv <- dbDriver("PostgreSQL")
 con <- dbConnect(drv, dbname = "Atotech",
                  host = "axialyzeproduction.c5drkcatbgmm.eu-central-1.rds.amazonaws.com", port = 8080,
                  user = "aXialyze", password = "aXialyze0000")
-df <- dbGetQuery(con, "SELECT distinct material,  salesorg,to_char(ss,'YYYY-MM-DD') requested_deliv_date_to, to_char(ss + '1 month' ::interval,'MM.YYYY') fcperiod
+df <- dbGetQuery(con, "select * from (
+                  select * , ROW_NUMBER () OVER () as rnum
+                 from (SELECT distinct material,
+                 salesorg,
+                 to_char(ss, 'YYYY-MM-DD')                     requested_deliv_date_to,
+                 to_char(ss + '1 month' ::interval, 'MM.YYYY') fcperiod
+
                  FROM generate_series(
                  (select requested_deliv_date_to
-                 FROM public.parameter_sets ps where ps.fcrun = (SeLECT fcrun FROM current_run)),
+                 FROM public.parameter_sets ps
+                 where ps.fcrun = (SeLECT fcrun FROM current_run)),
                  (select todate
-                 FROM public.parameter_sets ps where ps.fcrun = (SeLECT fcrun FROM current_run) ),'1 month') ss
+                 FROM public.parameter_sets ps
+                 where ps.fcrun = (SeLECT fcrun FROM current_run)), '1 month') ss
 
-                 left join      public.material_planninglevel m
+                 left join public.material_planninglevel m
                  on planninglevel = 'material region' and salesorg ilike '8%'
-                 where not exists (select 1 from fcst_accuracy f where f.fcrun = (SeLECT fcrun FROM current_run) and m.material = f.material and geography = salesorg and fcperiod =to_char(ss + '1 month' ::interval,'MM.YYYY') )
-;" )
+                 where not exists(select 1
+                 from fcst_accuracy f
+                 where f.fcrun = (SeLECT fcrun FROM current_run)
+                 and m.material = f.material
+                 and geography = salesorg
+                 and fcperiod = to_char(ss + '1 month' ::interval, 'MM.YYYY'))
+                 )a)b
+                 where b.rnum <7666;
+
+                 " )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
 #FROM public.sandop_selection
