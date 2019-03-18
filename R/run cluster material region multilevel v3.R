@@ -21,7 +21,6 @@ df <- dbGetQuery(con, "SELECT distinct material,  salesorg,to_char(ss,'YYYY-MM-D
                  left join      public.material_planninglevel m
                  on planninglevel = 'material region' and salesorg ilike '8%'
                  where not exists (select 1 from fcst_accuracy f where f.fcrun = (SeLECT fcrun FROM current_run) and m.material = f.material and geography = salesorg and fcperiod =to_char(ss + '1 month' ::interval,'MM.YYYY') )
-limit 50
 ;" )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
