@@ -14,7 +14,7 @@ con <- dbConnect(drv, dbname = "Atotech",
 df <- dbGetQuery(con, "select * from (
                   select * , ROW_NUMBER () OVER () as rnum
                  from (SELECT distinct material,
-                 salesorg,
+                 left(planningkey,10) as mykey,
                  to_char(ss, 'YYYY-MM-DD')                     requested_deliv_date_to,
                  to_char(ss + '1 month' ::interval, 'MM.YYYY') fcperiod
 
@@ -26,17 +26,15 @@ df <- dbGetQuery(con, "select * from (
                  FROM public.parameter_sets ps
                  where ps.fcrun = (SeLECT fcrun FROM current_run)), '1 month') ss
 
-                 left join public.material_planninglevel m
-                 on planninglevel = 'material region' and salesorg ilike '8%'
+                 left join public.material_planninglevel70 m on true
                  where not exists(select 1
                  from fcst_accuracy f
                  where f.fcrun = (SeLECT fcrun FROM current_run)
                  and m.material = f.material
-                 and geography = salesorg
+                 and geography = left(planningkey,10)
                  and fcperiod = to_char(ss + '1 month' ::interval, 'MM.YYYY'))
                  )a)b
-                 where b.rnum <7666;
-
+                 where b.rnum <3455;
                  " )
 
 #other option df <- dbGetQuery(con, "SELECT material, cluster, lpad(custdfomer_code,10,'0') customer_code, totalvolume,  ts_categorie
